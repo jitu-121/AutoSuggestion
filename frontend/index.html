@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mkcl Marathi Studio - AI Transliteration & Autocomplete Editor</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Noto+Sans+Devanagari:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="dark-theme">
+
+    <!-- Toast Notification Container -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- Keyboard Shortcuts Help Modal Overlay -->
+    <div id="shortcutsModal" class="modal-overlay hidden">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>Keyboard Shortcuts</h3>
+                <button id="closeModalBtn" class="icon-btn" title="Close Modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="shortcut-row">
+                    <span class="shortcut-desc">Accept Autocomplete Suggestion</span>
+                    <kbd>Tab</kbd> / <kbd>Enter</kbd>
+                </div>
+                <div class="shortcut-row">
+                    <span class="shortcut-desc">Navigate Candidates (1–5)</span>
+                    <kbd>&uarr;</kbd> <kbd>&darr;</kbd>
+                </div>
+                <div class="shortcut-row">
+                    <span class="shortcut-desc">Transliterate Word to Marathi</span>
+                    <kbd>Space</kbd>
+                </div>
+                <div class="shortcut-row">
+                    <span class="shortcut-desc">Dismiss Suggestion Dropdown</span>
+                    <kbd>Esc</kbd>
+                </div>
+                <div class="shortcut-row">
+                    <span class="shortcut-desc">Copy Marathi Text</span>
+                    <kbd>Ctrl</kbd> + <kbd>C</kbd>
+                </div>
+                <div class="shortcut-row">
+                    <span class="shortcut-desc">Undo / Redo</span>
+                    <kbd>Ctrl</kbd> + <kbd>Z</kbd> / <kbd>Ctrl</kbd> + <kbd>Y</kbd>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Workspace Layout -->
+    <div class="app-layout">
+
+        <!-- Top Navigation Bar -->
+        <header class="app-header">
+            <div class="header-left">
+                <div class="brand-logo">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M2 17L12 22L22 17" stroke="#06b6d4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M2 12L12 17L22 12" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <span class="brand-name">Mkcl Marathi Studio</span>
+                </div>
+            </div>
+
+            <div class="header-right">
+                <div class="header-actions">
+                    <button id="shortcutsBtn" class="btn btn-ghost" title="Keyboard Shortcuts">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+                        </svg>
+                        <span>Shortcuts</span>
+                    </button>
+                    <button id="fullscreenBtn" class="btn btn-ghost" title="Toggle Fullscreen">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Workspace -->
+        <main class="workspace-main">
+
+            <section class="editor-container">
+
+                <!-- Editor Toolbar Header -->
+                <div class="editor-header">
+                    <div class="tab-list">
+                        <div class="editor-tab active">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+                                <polyline points="14 2 14 8 20 8"/>
+                            </svg>
+                            <span class="tab-title">document.txt</span>
+                            <span id="unsavedDot" class="unsaved-indicator hidden">&bull;</span>
+                        </div>
+                    </div>
+
+                    <div class="direction-badge">
+                        <span class="lang-src">English (Roman)</span>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="9 18 15 12 9 6"/>
+                        </svg>
+                        <span class="lang-tgt">देवनागरी (Marathi)</span>
+                    </div>
+
+                    <div class="action-toolbar">
+                        <div class="history-controls">
+                            <button id="undoBtn" class="icon-btn-sm" title="Undo (Ctrl+Z)" disabled>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/>
+                                </svg>
+                            </button>
+                            <button id="redoBtn" class="icon-btn-sm" title="Redo (Ctrl+Y)" disabled>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 7v6h-6"/><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l3 2.7"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <button id="clearBtn" class="btn btn-secondary btn-sm">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                            </svg>
+                            <span>Clear</span>
+                        </button>
+                        <button id="copyBtn" class="btn btn-primary btn-sm">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                            </svg>
+                            <span>Copy Text</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Editor Textarea Area with Line Numbers & Caret Tracking -->
+                <div class="editor-viewport" id="viewport">
+                    
+                    <div class="line-gutter">
+                        <div class="line-numbers" id="lineNumbers">
+                            <div class="active">1</div>
+                        </div>
+                    </div>
+
+                    <div class="editor-content-area">
+
+                        <!-- Empty State Helper Banner -->
+                        <div id="emptyState" class="empty-state-banner">
+                            <div class="banner-title">Start typing in English phonetics</div>
+                            <div class="banner-examples">
+                                Try typing: <code class="chip">jitendra</code> 
+                            </div>
+                        </div>
+
+                        <textarea 
+                            id="editorArea" 
+                            class="editor-textarea" 
+                            placeholder="" 
+                            spellcheck="false"
+                            autofocus
+                        ></textarea>
+
+                        <!-- Floating Raycast / VS Code Autocomplete Dropdown -->
+                        <div id="cursorPopover" class="popover-dropdown hidden">
+                            <div class="popover-bar">
+                                <span id="popoverTitle" class="popover-label">TYPING CANDIDATES</span>
+                                <span class="popover-keys">
+                                    <kbd>&uarr;&darr;</kbd> navigate &bull; <kbd>Tab</kbd> select
+                                </span>
+                            </div>
+                            <div id="popoverList" class="popover-items-list">
+                                <!-- Popover Items rendered dynamically -->
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Bottom Status Bar -->
+                <footer class="app-statusbar">
+                    <div class="statusbar-left">
+                        <span id="posTracker" class="status-segment">Ln 1, Col 1</span>
+                        <span class="divider"></span>
+                        <span id="wordCounter" class="status-segment">0 words</span>
+                        <span class="divider"></span>
+                        <span id="charCounter" class="status-segment">0 chars</span>
+                        <span class="divider"></span>
+                        <span id="saveStatus" class="status-segment text-muted">Auto-saved to local</span>
+                    </div>
+
+                    <div class="statusbar-right">
+                        <span id="modeBadge" class="mode-tag">Mode: Transliteration</span>
+                        <span class="divider"></span>
+                        <span class="engine-label">Mkcl Marathi Engine</span>
+                    </div>
+                </footer>
+
+            </section>
+        </main>
+    </div>
+
+    <script src="editor.js"></script>
+</body>
+</html>
