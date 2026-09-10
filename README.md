@@ -30,10 +30,7 @@ autosuggestion/
 │       ├── train/             # Training split
 │       └── validate/          # Validation split
 │
-├── test_step1.py              # Backend API test suite
-├── test_step2.py              # Web GUI asset & API test suite
-├── test_step3.py              # Two-Phase autocompletion test suite
-├── .gitignore                 # Production git ignore rules
+
 └── README.md                  # Project documentation
 ```
 
