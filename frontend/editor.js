@@ -31,6 +31,7 @@ let currentCandidates = [];
 let selectedIndex = 0;
 let isServerOnline = false;
 let currentMode = 'transliteration'; // 'transliteration' or 'prediction'
+let lastCaretPos = 0;
 
 // Undo / Redo Stack
 const historyStack = [''];
@@ -71,6 +72,9 @@ function updateEditorStats() {
     const lineCount = lines.length;
 
     const selStart = editorArea.selectionStart;
+    if (typeof selStart === 'number' && selStart > 0) {
+        lastCaretPos = selStart;
+    }
     const textBeforeCursor = text.substring(0, selStart);
     const currentLineIndex = textBeforeCursor.split('\n').length;
     const colNum = selStart - textBeforeCursor.lastIndexOf('\n');
@@ -210,9 +214,18 @@ function renderPopoverItems() {
 }
 
 // 8. Fetch Suggestions from Backend API
+const modelModeSelect = document.getElementById('modelModeSelect');
+
+if (modelModeSelect) {
+    modelModeSelect.addEventListener('change', () => {
+        showToast(`Switched model to: ${modelModeSelect.options[modelModeSelect.selectedIndex].text}`, 'info');
+        fetchSuggestions();
+    });
+}
+
 async function fetchSuggestions() {
     const text = editorArea.value;
-    const cursor = editorArea.selectionStart;
+    const cursor = (typeof editorArea.selectionStart === 'number' && editorArea.selectionStart > 0) ? editorArea.selectionStart : (lastCaretPos || text.length);
     const textBefore = text.substring(0, cursor);
     
     if (!textBefore.trim()) {
@@ -224,6 +237,7 @@ async function fetchSuggestions() {
     const words = textBefore.split(/\s+/);
     const lastWord = words[words.length - 1] || '';
     const hasSpaceAtEnd = textBefore.endsWith(' ') || textBefore.endsWith('\n');
+    const selectedModelMode = modelModeSelect ? modelModeSelect.value : 'fine_tuned';
 
     try {
         const response = await fetch(`${API_BASE_URL}/api/suggest`, {
@@ -233,7 +247,8 @@ async function fetchSuggestions() {
                 text: textBefore,
                 current_word: lastWord,
                 cursor_position: cursor,
-                has_space_at_end: hasSpaceAtEnd
+                has_space_at_end: hasSpaceAtEnd,
+                model_mode: selectedModelMode
             })
         });
 

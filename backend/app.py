@@ -47,6 +47,7 @@ class SuggestionRequest(BaseModel):
     current_word: Optional[str] = ""
     cursor_position: Optional[int] = None
     has_space_at_end: Optional[bool] = False
+    model_mode: Optional[str] = "fine_tuned"  # "base" or "fine_tuned"
 
 class SuggestionItem(BaseModel):
     word: str
@@ -72,6 +73,7 @@ def get_suggestions(req: SuggestionRequest):
     raw_word = (req.current_word or "").strip()
     raw_text = req.text or ""
     has_space = req.has_space_at_end or raw_text.endswith(" ") or raw_text.endswith("\n")
+    m_mode = req.model_mode or "fine_tuned"
 
     # Mode 1: Phase A - Typing a word (No trailing space)
     # Return Top 5 Transliteration Candidates for the active word (e.g. 'jiten' -> ['जितेन', 'जितेंद्र', ...])
@@ -99,7 +101,8 @@ def get_suggestions(req: SuggestionRequest):
 
     top_suggestions = model_engine.predict_top_5(
         text_prefix=transliterated_full_text,
-        active_word=transliterated_word
+        active_word=transliterated_word,
+        model_mode=m_mode
     )
     
     suggestion_items = [

@@ -91,3 +91,6 @@ scratch/
 # Gemini / Agent System Files
 .gemini/
 .agents/
+
+# User Private Folders
+shreni_code/

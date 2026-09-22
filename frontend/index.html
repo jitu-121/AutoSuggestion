@@ -64,6 +64,13 @@
                     </svg>
                     <span class="brand-name">Mkcl Marathi Studio</span>
                 </div>
+                <div class="model-selector-container" style="display: flex; align-items: center; background: rgba(255,255,255,0.05); padding: 3px 8px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); margin-left: 16px;">
+                    <span style="font-size: 11px; color: #a1a1aa; font-weight: 500; margin-right: 8px;">AI Model:</span>
+                    <select id="modelModeSelect" style="background: #18181b; color: #38bdf8; border: 1px solid #38bdf8; padding: 3px 8px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer;">
+                        <option value="fine_tuned">✨ Fine-Tuned LoRA Model (Active)</option>
+                        <option value="base">🏛️ Pure Base Model (Original L3Cube)</option>
+                    </select>
+                </div>
             </div>
 
             <div class="header-right">
@@ -203,6 +210,6 @@
         </main>
     </div>
 
-    <script src="editor.js"></script>
+    <script src="editor.js?v=2.5"></script>
 </body>
 </html>
