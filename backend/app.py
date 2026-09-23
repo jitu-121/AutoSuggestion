@@ -58,6 +58,7 @@ class SuggestionResponse(BaseModel):
     original_input: str
     transliterated_word: str
     transliterated_full_text: str
+    ghost_suggestion: Optional[str] = ""
     top_5_suggestions: List[SuggestionItem]
 
 @app.get("/health")
@@ -76,7 +77,7 @@ def get_suggestions(req: SuggestionRequest):
     m_mode = req.model_mode or "fine_tuned"
 
     # Mode 1: Phase A - Typing a word (No trailing space)
-    # Return Top 5 Transliteration Candidates for the active word (e.g. 'jiten' -> ['जितेन', 'जितेंद्र', ...])
+    # Return Top Transliteration Candidate as ghost suggestion
     if not has_space and raw_word:
         cands = get_transliteration_candidates(raw_word, k=5)
         top_items = [
@@ -86,16 +87,20 @@ def get_suggestions(req: SuggestionRequest):
         primary_translit = cands[0] if cands else natural_marathi_transliterate(raw_word)
         full_translit = transliterate_text(raw_text)
 
+        # Single ghost completion for Phase A
+        ghost_single = primary_translit
+
         return SuggestionResponse(
             mode="transliteration",
             original_input=raw_word,
             transliterated_word=primary_translit,
             transliterated_full_text=full_translit,
+            ghost_suggestion=ghost_single,
             top_5_suggestions=top_items
         )
 
     # Mode 2: Phase B - Word completed / Space pressed
-    # Return Top 5 L3Cube Next-Word Predictions (e.g. 'जितेंद्र ' -> ['आहे', 'म्हणाला', ...])
+    # Return Single Top Accurate Next-Word Prediction as Ghost Suggestion
     transliterated_word = natural_marathi_transliterate(raw_word) if raw_word else ""
     transliterated_full_text = transliterate_text(raw_text)
 
@@ -110,11 +115,14 @@ def get_suggestions(req: SuggestionRequest):
         for item in top_suggestions
     ]
 
+    single_ghost_word = top_suggestions[0]["word"] if top_suggestions else ""
+
     return SuggestionResponse(
         mode="prediction",
         original_input=raw_word,
         transliterated_word=transliterated_word,
         transliterated_full_text=transliterated_full_text,
+        ghost_suggestion=single_ghost_word,
         top_5_suggestions=suggestion_items
     )
 

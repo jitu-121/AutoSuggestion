@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mkcl Marathi Studio - AI Transliteration & Autocomplete Editor</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css?v=3.1">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Noto+Sans+Devanagari:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
@@ -23,19 +23,15 @@
             </div>
             <div class="modal-body">
                 <div class="shortcut-row">
-                    <span class="shortcut-desc">Accept Autocomplete Suggestion</span>
-                    <kbd>Tab</kbd> / <kbd>Enter</kbd>
-                </div>
-                <div class="shortcut-row">
-                    <span class="shortcut-desc">Navigate Candidates (1–5)</span>
-                    <kbd>&uarr;</kbd> <kbd>&darr;</kbd>
+                    <span class="shortcut-desc">Accept Smart Compose Ghost Text</span>
+                    <kbd>Tab</kbd> / <kbd>&rarr;</kbd>
                 </div>
                 <div class="shortcut-row">
                     <span class="shortcut-desc">Transliterate Word to Marathi</span>
                     <kbd>Space</kbd>
                 </div>
                 <div class="shortcut-row">
-                    <span class="shortcut-desc">Dismiss Suggestion Dropdown</span>
+                    <span class="shortcut-desc">Dismiss Prediction</span>
                     <kbd>Esc</kbd>
                 </div>
                 <div class="shortcut-row">
@@ -67,8 +63,8 @@
                 <div class="model-selector-container" style="display: flex; align-items: center; background: rgba(255,255,255,0.05); padding: 3px 8px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); margin-left: 16px;">
                     <span style="font-size: 11px; color: #a1a1aa; font-weight: 500; margin-right: 8px;">AI Model:</span>
                     <select id="modelModeSelect" style="background: #18181b; color: #38bdf8; border: 1px solid #38bdf8; padding: 3px 8px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer;">
-                        <option value="fine_tuned">✨ Fine-Tuned LoRA Model (Active)</option>
-                        <option value="base">🏛️ Pure Base Model (Original L3Cube)</option>
+                        <option value="fine_tuned">Fine-Tuned L3Cube Model (Active)</option>
+                        <option value="base">Pure Base Model (Original L3Cube)</option>
                     </select>
                 </div>
             </div>
@@ -159,28 +155,29 @@
                         <div id="emptyState" class="empty-state-banner">
                             <div class="banner-title">Start typing in English phonetics</div>
                             <div class="banner-examples">
-                                Try typing: <code class="chip">jitendra</code> 
+                                Try typing: <code class="chip">udya sakali</code> 
                             </div>
                         </div>
 
-                        <textarea 
+                        <!-- Contenteditable Editor with Native Inline Ghost Text -->
+                        <div 
                             id="editorArea" 
-                            class="editor-textarea" 
-                            placeholder="" 
+                            class="editor-contenteditable" 
+                            contenteditable="true" 
                             spellcheck="false"
                             autofocus
-                        ></textarea>
+                        ></div>
 
-                        <!-- Floating Raycast / VS Code Autocomplete Dropdown -->
+                        <!-- Transliteration 5-Candidate Dropdown Popover (Phase A) -->
                         <div id="cursorPopover" class="popover-dropdown hidden">
                             <div class="popover-bar">
-                                <span id="popoverTitle" class="popover-label">TYPING CANDIDATES</span>
+                                <span id="popoverTitle" class="popover-label">TRANSLITERATION CANDIDATES</span>
                                 <span class="popover-keys">
-                                    <kbd>&uarr;&darr;</kbd> navigate &bull; <kbd>Tab</kbd> select
+                                    <kbd>&uarr;&darr;</kbd> navigate &bull; <kbd>Space</kbd> / <kbd>Tab</kbd> select
                                 </span>
                             </div>
                             <div id="popoverList" class="popover-items-list">
-                                <!-- Popover Items rendered dynamically -->
+                                <!-- Rendered dynamically -->
                             </div>
                         </div>
 
