@@ -31,14 +31,18 @@ MANIFEST
 *.pth
 *.bin
 *.onnx
-*.safetensors
 *.h5
 *.pb
 *.tflite
-models/
 huggingface/
 .cache/
 checkpoints/
+
+# Track final LoRA model adapter while ignoring intermediate training checkpoints
+!models/
+!models/marathi-gpt-lora/
+!models/marathi-gpt-lora/*
+models/marathi-gpt-lora/checkpoint-*/
 
 # Virtual Environments
 venv/
